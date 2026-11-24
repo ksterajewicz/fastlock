@@ -99,13 +99,10 @@ Examples:
 docs: add README, AGENTS.md and LICENSE
 feat(tui): add key list
 fix(core): reject a file whose last chunk fails authentication
-feat(cli)!: rename the verify command
+feat(cli)!: require --force to replace an existing file
 
-BREAKING CHANGE: `fastlock check` is now `fastlock verify`.
+BREAKING CHANGE: commands no longer overwrite an existing output file.
 ```
-
-The command names in these examples are illustrations. The commands are not
-designed yet.
 
 ## What will not be merged
 

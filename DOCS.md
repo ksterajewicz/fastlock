@@ -62,6 +62,10 @@ Opening an encrypted file starts a session. While the session is open you
 work with the contents. Closing the session removes what was decrypted and
 clears the keys from memory.
 
+A session is a temporary copy. Changes you make in it are not written back
+to the encrypted file, and fastlock warns you when you close a session that
+has changes. To keep them, encrypt the changed files again.
+
 A session is meant to close by itself as well: after a time without
 activity, when the screen locks, and before the computer sleeps. The exact
 timings are not decided.
@@ -92,6 +96,10 @@ always happens before encryption.
 All compression in fastlock is lossless: every file comes back byte for
 byte.
 
+Compression is on by default. A single file becomes `name.zst.age`, and a
+folder becomes `name.tar.zst.age`. With compression turned off, a single
+file becomes a plain `name.age` that any age tool opens directly.
+
 ### Keys and where they live
 
 fastlock keeps keys in the standard locations of each tool, such as `~/.ssh`
@@ -112,11 +120,126 @@ device as your passwords.
 
 ### Commands
 
-The commands are not designed yet. The rule is already fixed: every action
-in any interface is also a command.
+The commands below were designed on 2026-11-24. None of them is implemented
+yet, and details can still change before the first release. A full entry for
+each command, with its synopsis, options and examples, is added when the
+command is implemented.
 
-When commands exist, each one gets an entry here with its synopsis, what it
-does, its options, examples, and exit codes.
+Every command has the shape `fastlock <command> [arguments] [flags]`.
+
+- Actions on files are single verbs, such as `encrypt` and `open`. Things
+  fastlock keeps for you are groups, such as `key list` and `totp add`.
+- There is no flag for choosing a format. The format follows from who can
+  open the file: age keys, SSH keys and passphrases give an age file, and
+  PGP keys give an OpenPGP file. One file cannot mix the two kinds.
+- A passphrase is never an argument. fastlock asks for it, or reads it from
+  a file given with `--passphrase-file`.
+- Nothing is overwritten silently. A command refuses to replace an existing
+  file unless you add `--force`.
+- Every command can answer in JSON with `--json`.
+- Running `fastlock` with no arguments prints a short help.
+
+#### Files
+
+| Command | What it does |
+|---|---|
+| `fastlock encrypt <path>...` | Encrypts a file. Given a folder or several paths, packs, compresses and encrypts them into one file. |
+| `fastlock decrypt <file>` | Decrypts to disk, and unpacks if the file is an archive. |
+| `fastlock inspect <file>` | Shows what a file is without needing a key: format, who can open it, post-quantum or not, size. With `--contents` it asks for the key and lists the files inside, writing nothing. |
+| `fastlock verify <file>` | Decrypts in memory, checks the file to its last byte, and writes nothing. |
+
+Main flags of `encrypt`:
+
+| Flag | Meaning |
+|---|---|
+| `--to <key>` | Who can open the file: the name of a saved key, a public key, or a path to one. Can be repeated. |
+| `-p`, `--passphrase` | Protect the file with a passphrase. |
+| `-o`, `--output <path>` | Where to write the result. |
+| `--compress zstd\|lzma\|none` | The compression method. The default is `zstd`. |
+| `-a`, `--armor` | Write text instead of binary data. |
+
+Main flags of `decrypt`: `-o`, `--output <path>` and `--key <name or path>`.
+
+#### Sessions
+
+| Command | What it does |
+|---|---|
+| `fastlock open <file>` | Starts a session: decrypts into memory and makes the contents available until the session is closed. |
+| `fastlock close [<session>]` | Closes a session and wipes what was decrypted. `--all` closes every session. |
+| `fastlock status` | Lists open sessions and the time left before each closes by itself. |
+
+`fastlock open` keeps running in the terminal that started it. It shows
+where the contents are and how much time is left. Press Ctrl+C there, or
+run `fastlock close` in another terminal, to close the session. Closing the
+terminal, or losing the connection, closes the session too. With `--detach`
+the session runs in the background instead.
+
+#### Keys
+
+| Command | What it does |
+|---|---|
+| `fastlock key list` | Lists keys. `--type age\|ssh\|pgp` narrows the list. |
+| `fastlock key new <name>` | Creates a key. The default is a post-quantum age key. `--type ssh` and `--type pgp` create the other kinds, and `--classic` makes a classic age key. |
+| `fastlock key show <name>` | Shows one key: type, public key, fingerprint, and where it is stored. |
+| `fastlock key import <file>` | Adds a key from a file: your own, or someone's public key. |
+| `fastlock key export <name>` | Writes the public key, to give to someone. `--secret` writes the private key. |
+| `fastlock key remove <name>` | Removes a key after confirmation. |
+
+#### TOTP
+
+| Command | What it does |
+|---|---|
+| `fastlock totp list` | Lists TOTP keys. |
+| `fastlock totp add <name>` | Adds a TOTP key. The secret is read from a prompt or a file, never from an argument. |
+| `fastlock totp code <name>` | Prints the current code. |
+| `fastlock totp remove <name>` | Removes a TOTP key after confirmation. |
+
+#### Backup
+
+| Command | What it does |
+|---|---|
+| `fastlock backup -o <file>` | Saves all your keys and TOTP keys into one encrypted file. The file is an ordinary fastlock archive, so standard tools can open it. |
+| `fastlock restore <file>` | Brings them back from such a file. |
+
+#### The program
+
+| Command | What it does |
+|---|---|
+| `fastlock tui` | Opens the terminal interface. |
+| `fastlock help [<command>]` | Shows help. `-h` and `--help` work on every command. |
+| `fastlock version` | Prints the version. |
+| `fastlock completions <shell>` | Prints shell completions. |
+
+Reserved for later: `fastlock message encrypt` and
+`fastlock message decrypt`, for quick messages with PGP keys.
+
+#### Flags that work everywhere
+
+| Flag | Meaning |
+|---|---|
+| `--json` | Machine-readable output. |
+| `-q`, `--quiet` | Print only errors. |
+| `-v`, `--verbose` | Print more detail. |
+| `--no-color` | No colors. The `NO_COLOR` environment variable does the same. |
+| `--no-input` | Never prompt. Fail instead, and name the missing input. |
+| `--yes` | Answer yes to confirmations. It never replaces a passphrase. |
+| `--passphrase-file <path>` | Read the passphrase from a file instead of a prompt. |
+| `--force` | Allow an existing file to be replaced. |
+
+#### Exit codes
+
+These codes are fixed from the first release on and are never renumbered.
+
+| Code | Meaning |
+|---|---|
+| 0 | Success. |
+| 1 | A failure not listed below. |
+| 2 | The command was used wrongly. |
+| 3 | No key fits, or the passphrase is wrong. |
+| 4 | The file is damaged or was changed: authentication failed. |
+| 5 | Not found: a file, a key, or a session. |
+| 6 | Refused: the output exists, or a confirmation is needed. |
+| 7 | Cancelled by you. |
 
 ### Terminal interface
 

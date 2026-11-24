@@ -104,6 +104,13 @@ decision describes behavior, the full description is in
 - **Language:** Rust, chosen for speed and reliability.
 - **Commands first:** every action in any interface is also a command.
   Interfaces contain no encryption logic of their own.
+- **Command list:** designed and listed in DOCS.md, "Commands", with the
+  shared flags and exit codes. The main verbs are `encrypt` and `decrypt`.
+  The whole key collection is saved with `backup` and `restore`. Do not
+  rename, add or remove a command without asking.
+- **Sessions:** `open` keeps running in its terminal until the session is
+  closed; `--detach` puts it in the background. A session is a temporary
+  copy: changes are never written back to the encrypted file.
 - **Platforms:** Linux, Windows and macOS. Work starts on Linux.
 - **First interface:** a terminal interface for Linux, built with `ratatui`
   and `crossterm`. Its layout, mouse behavior and Neovim-style keys are in
@@ -129,8 +136,8 @@ decision describes behavior, the full description is in
   credited, and the software can never become a closed product. Do not add
   code or dependencies whose license is not compatible with it.
 - **Documentation layout:** as in "Where things live". `README.md` stays
-  short. Its "Installation" and "Commands" sections are placeholders until
-  the commands are designed with the maintainer; fill them in then.
+  short. Its "Installation" section is a placeholder until there is
+  something to install.
 
 ## Working assumptions
 
@@ -157,7 +164,8 @@ a way that is hard to undo.
 
 Do not settle these on your own.
 
-1. **Commands.** Names and arguments are not designed.
+1. **Command details.** The full flags of each command, how sessions are
+   named, and the shape of the JSON output.
 2. **Post-quantum age keys in Rust.** Either call the official `age` program
    for this key type in the first version, or use a small module built on
    standard building blocks and checked against the official test vectors.
@@ -169,8 +177,8 @@ Do not settle these on your own.
    is protected, which key types it covers, and where TOTP keys are stored.
 6. **Compression details.** Levels and the default level. Whether fastlock
    reads archives made by other tools.
-7. **Sessions.** Auto-close timings, and what happens when the terminal is
-   closed or the connection drops.
+7. **Sessions.** Auto-close timings, and where decrypted files are held on
+   Windows and macOS.
 8. **Themes.** The file format, and whether the program can create a theme
    file or only reads one.
 9. **Desktop app.** The final look, how the window talks to the core, and
@@ -189,9 +197,9 @@ Do not settle these on your own.
 - A change to what fastlock protects, or does not protect, updates the
   security model in the same change. Give a new item the next free number.
   Never reuse or renumber G and N items.
-- Each command gets one entry under "Commands" in `DOCS.md`: synopsis, what
-  it does, options, examples, exit codes. It also gets one line in the
-  "Commands" section of `README.md`.
+- When a command is implemented, it gets a full entry under "Commands" in
+  `DOCS.md`: synopsis, what it does, options, examples, exit codes. Its line
+  in the tables there and in `README.md` stays in step with the code.
 - Exit codes live in one table and are never renumbered.
 - Do not rename headings in `DOCS.md`. Other files link to them.
 - State only what is decided or what the code does. Mark anything else as

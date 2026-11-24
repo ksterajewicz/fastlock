@@ -30,7 +30,33 @@ Not available yet.
 
 ## Commands
 
-Not available yet.
+Designed, not implemented yet. Details are in [DOCS.md](DOCS.md#commands).
+
+| Command | What it does |
+|---|---|
+| `fastlock encrypt` | Encrypt a file, or pack, compress and encrypt a folder |
+| `fastlock decrypt` | Decrypt a file to disk and unpack it |
+| `fastlock inspect` | Show what a file is, without needing a key |
+| `fastlock verify` | Check a file in memory, writing nothing |
+| `fastlock open` | Open a session: work with the contents in memory |
+| `fastlock close` | Close a session and wipe what was decrypted |
+| `fastlock status` | List open sessions |
+| `fastlock key list` | List your keys |
+| `fastlock key new` | Create a key |
+| `fastlock key show` | Show one key |
+| `fastlock key import` | Add a key from a file |
+| `fastlock key export` | Write a public key to give to someone |
+| `fastlock key remove` | Remove a key |
+| `fastlock totp list` | List your TOTP keys |
+| `fastlock totp add` | Add a TOTP key |
+| `fastlock totp code` | Print the current code |
+| `fastlock totp remove` | Remove a TOTP key |
+| `fastlock backup` | Save all keys and TOTP keys into one encrypted file |
+| `fastlock restore` | Bring them back from such a file |
+| `fastlock tui` | Open the terminal interface |
+| `fastlock help` | Show help |
+| `fastlock version` | Print the version |
+| `fastlock completions` | Print shell completions |
 
 ## Documentation
 
