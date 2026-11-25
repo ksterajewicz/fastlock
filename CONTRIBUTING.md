@@ -127,7 +127,8 @@ problem yourself before you send it.
 
 ## Building and testing
 
-You need Rust 1.88 or newer. The end-to-end tests also use the `age` and
+You need Rust 1.88 or newer and a C compiler, because some of the
+libraries fastlock uses are written in C. The end-to-end tests also use the `age` and
 `age-keygen` programs, version 1.3 or newer; without them those tests skip
 themselves.
 

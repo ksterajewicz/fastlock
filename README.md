@@ -6,8 +6,9 @@ Fast, open-source file encryption and key management from the command line.
 > been audited.
 
 fastlock brings several encryption tools together in one program. It is
-written in Rust, which makes it fast and reliable, and it works with
-established formats instead of inventing its own.
+written in Rust, which makes it fast and reliable. It builds on established
+libraries, written in Rust or in C, and on established formats instead of
+inventing its own.
 
 ## Goals
 

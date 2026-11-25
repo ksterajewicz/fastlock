@@ -111,6 +111,12 @@ decision describes behavior, the full description is in
 
 - **Name:** `fastlock`, also the command typed in a terminal.
 - **Language:** Rust, chosen for speed and reliability.
+- **Libraries in Rust or C** (2026-11-25): an established library written
+  in C, used through Rust bindings, is as acceptable as one written in Rust.
+  The speed is about the same, and C libraries often come with more code
+  and documentation. Choose by maturity, maintenance, license and how well
+  the result works with the standard tool, not by language. Adding any
+  dependency still needs the maintainer's approval.
 - **Commands first:** every action in any interface is also a command.
   Interfaces contain no encryption logic of their own.
 - **Command list:** designed and listed in DOCS.md, "Commands", with the

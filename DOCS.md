@@ -41,8 +41,9 @@ There are three ways to use it:
    runs the same commands.
 3. **Desktop app.** Planned for later. It also runs the same commands.
 
-fastlock is written in Rust. It is built for Linux first, then for Windows
-and macOS.
+fastlock is written in Rust. The encryption, compression and key handling
+come from established libraries, written in Rust or in C. It is built for
+Linux first, then for Windows and macOS.
 
 ## What fastlock does not do
 
