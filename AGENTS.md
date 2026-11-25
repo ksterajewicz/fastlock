@@ -143,18 +143,55 @@ decision describes behavior, the full description is in
 - **Order of work** (2026-11-25): first installation on Linux
   (`install.sh`), then the core features as commands, then the terminal
   interface for all of them.
+- **Nothing else to install** (2026-11-25): fastlock is one program file,
+  and a person installs nothing else to use it. Libraries, in Rust or C, are
+  compiled in through crates. Code from other projects is never copied into
+  the repository by hand: a copy would get no security updates. There is one
+  exception, described under "Post-quantum age keys".
+- **Post-quantum age keys** (2026-11-25): until the `age` crate supports
+  them (planned for rage 0.13, no date), they are made and opened by the
+  official `age` program, used only when it is installed. While that is so,
+  new age keys are classic X25519 keys by default, and
+  `fastlock key new --pq` makes a post-quantum one. When the crate supports
+  them, check it against the official test vectors before switching; then
+  post-quantum keys become the default.
+- **RSA keys** (2026-11-25): supported for SSH and PGP. The `age`, `pgp`
+  and `ssh-key` crates use `rsa` 0.9, which has the Marvin timing attack
+  (RUSTSEC-2023-0071). The risk is stated as N10 in the security model.
+  Move to `rsa` 0.10 or newer as soon as these crates do.
 - **Key types:** age keys (classic and post-quantum), OpenPGP keys, and SSH
   keys. SSH keys are managed inside the program.
-- **Keys live in the standard locations** of each tool, such as `~/.ssh` and
-  `~/.gnupg`.
+- **OpenPGP library** (2026-11-25): rPGP, the `pgp` crate. It is compiled
+  in, so PGP works without GnuPG. Its BZip2 support stays on, so that PGP
+  data compressed with BZip2 can be opened.
+- **SSH key library** (2026-11-25): the `ssh-key` crate. Tests check that
+  its files work with OpenSSH.
+- **Where keys live** (changed 2026-11-25): SSH keys live in `~/.ssh`, and
+  importing one only adds it to fastlock's list, without a copy. PGP
+  keys are kept by fastlock as standard OpenPGP files in a folder of its
+  own; fastlock does not write into `~/.gnupg`. Every key stays readable by
+  other programs (G5).
+- **Import from standard folders** (2026-11-25): keys can be imported into
+  fastlock from the standard folders of other tools, such as SSH keys from
+  `~/.ssh` and PGP keys from GnuPG. PGP keys can also be exported to GnuPG.
+  Private keys held by GnuPG can only be read through the `gpg` program, so
+  that part works only when GnuPG is installed.
 - **Encryption choice:** a person chooses who can open a file (passphrase,
   age key, SSH key, PGP key). There is no list of ciphers.
 - **Compression:** pack, compress and encrypt in one step. Zstandard is the
   default, LZMA gives the smallest result, and compression can be off.
+  LZMA comes together with `encrypt`, through the `liblzma` crate with the
+  library built in (2026-11-25). Zstandard is built without its default
+  features: no pre-1.0 formats and no dictionary training (2026-11-25).
 - **Key export and import:** planned.
 - **TOTP keys:** stored encrypted, codes shown, export and import.
 - **Quick messages with PGP keys:** planned for later. Do not start before
   the file features exist.
+- **Third-party notices** (2026-11-25): a file `THIRD-PARTY-LICENSES`,
+  generated with `cargo-about`, lists every library compiled into fastlock
+  with its license and its authors, including the authors of code inside C
+  libraries. It is regenerated and checked before every release, shipped
+  with the program, and installed by `install.sh`.
 - **License:** `GPL-3.0-or-later`. Anyone can contribute, authorship is
   credited, and the software can never become a closed product. Do not add
   code or dependencies whose license is not compatible with it.
@@ -172,8 +209,9 @@ a way that is hard to undo.
 - How files are opened today: a file that uses a key is decrypted by the
   official `age` program, which receives the key over a pipe. A file
   protected by a passphrase, and a key file protected by one, are decrypted
-  with the `age` crate. This answers open question 2 for now, but the
-  maintainer has not chosen it as the long-term way.
+  with the `age` crate. This is to change: by the decision "Nothing else to
+  install", classic age keys and SSH ed25519 keys move to the `age` crate,
+  and only post-quantum keys keep using the `age` program.
 - Tests never use real keys or real data. They create both while they run.
 - Formats are compiled-in modules behind one common interface, not plugins
   loaded at run time.
@@ -194,13 +232,12 @@ Do not settle these on your own.
 
 1. **Command details.** The full flags of each command, how sessions are
    named, and the shape of the JSON output.
-2. **Post-quantum age keys in Rust.** Either call the official `age` program
-   for this key type in the first version, or use a small module built on
-   standard building blocks and checked against the official test vectors.
+2. **Post-quantum age keys in Rust.** Settled on 2026-11-25: see the
+   decision "Post-quantum age keys".
 3. **SSH key management.** Which actions exist: list, create, import, export
    the public key, delete.
-4. **Standard locations in detail.** Where age keys live, how the GnuPG
-   keyring is read and written safely, and the paths on Windows and macOS.
+4. **Standard locations in detail.** Where age keys live, which folder holds
+   the PGP keys fastlock keeps, and the paths on Windows and macOS.
 5. **Key export, import and TOTP.** What an export file looks like, how it
    is protected, which key types it covers, and where TOTP keys are stored.
 6. **Compression details.** Levels and the default level. Whether fastlock

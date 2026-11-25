@@ -107,6 +107,11 @@ BREAKING CHANGE: commands no longer overwrite an existing output file.
 
 - New cryptographic primitives, home-made cryptography, or a new file format.
   fastlock uses established, reviewed libraries and published formats only.
+- Code copied by hand from another project. Use that project's library
+  through a crate instead, so that it keeps getting security updates.
+- A dependency that people must install separately. fastlock is one program
+  file with its libraries compiled in. The only exception, post-quantum age
+  keys, is described in [AGENTS.md](AGENTS.md#decisions).
 - A change that weakens a default, or that lets people pick a weaker cipher.
 - Anything that sends data over the network, including telemetry and update
   checks.
@@ -171,6 +176,10 @@ Never put a real key or real data into a test.
   work.
 - Submit only work that you have the right to submit: your own, or work
   under a license compatible with ours.
+- The authors of the libraries compiled into fastlock are credited, with
+  each license, in a file `THIRD-PARTY-LICENSES` generated with
+  `cargo-about`. The file is being added. Once it exists, a change that adds
+  or updates a dependency regenerates it.
 - Your authorship stays in the history of the project. When a change is
   reworked before it is merged, the original author is kept with a
   `Co-authored-by:` line.

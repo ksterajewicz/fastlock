@@ -29,7 +29,8 @@ fastlock brings several encryption tools together in one program.
 - It encrypts and decrypts files in established formats: age and OpenPGP.
 - It packs, compresses and encrypts files and folders in one step.
 - It manages keys: age keys, OpenPGP keys and SSH keys. You can export the
-  keys you have saved and import them again.
+  keys you have saved and import them again, and import keys from `~/.ssh`
+  and from GnuPG.
 - It stores TOTP keys and shows the current codes.
 - Later, it will encrypt and decrypt short text messages with PGP keys,
   without creating a file.
@@ -80,8 +81,8 @@ open the file.
 | You choose | Who can open it | Good to know |
 |---|---|---|
 | A passphrase | Anyone who knows the passphrase | The strength of the file is the strength of the passphrase. |
-| An age key | The holder of that key | New age keys are post-quantum by default. |
-| An SSH key | The holder of that SSH key | Useful when someone already has an SSH key. No post-quantum protection. |
+| An age key | The holder of that key | Post-quantum age keys need the separate `age` program for now; see [Keys and where they live](#keys-and-where-they-live). |
+| An SSH key | The holder of that SSH key | Useful when someone already has an SSH key. No post-quantum protection. Prefer ed25519 keys to RSA keys; see [N10](#what-fastlock-does-not-protect). |
 | A PGP key | The holder of that PGP key | For people who use PGP tools. |
 
 ### Compression
@@ -104,12 +105,29 @@ file becomes a plain `name.age` that any age tool opens directly.
 
 ### Keys and where they live
 
-fastlock keeps keys in the standard locations of each tool, such as `~/.ssh`
-for SSH and `~/.gnupg` for GnuPG. fastlock is never the only program that can
-read a key. If you stop using fastlock, your keys still work everywhere else.
+fastlock is never the only program that can read a key. Every key is kept
+in a standard format, so if you stop using fastlock, your keys still work
+everywhere else.
 
-Where age keys live, and how the GnuPG keyring is read and written, is not
-decided yet.
+- **SSH keys** live in `~/.ssh`, as OpenSSH files. Both ed25519 and RSA
+  keys work; ed25519 keys are the better choice (see
+  [N10](#what-fastlock-does-not-protect)).
+- **PGP keys** are kept by fastlock as standard OpenPGP files, in a folder of
+  its own. fastlock does not write into the GnuPG folder `~/.gnupg`. It does
+  its PGP work itself, so GnuPG does not have to be installed.
+- **Importing.** fastlock can import keys from the standard folders of other
+  tools: SSH keys from `~/.ssh`, and PGP keys from GnuPG. An imported SSH
+  key stays where it is; fastlock only adds it to its list. It can also export
+  PGP keys to GnuPG. Private keys held by GnuPG can only be read through the
+  `gpg` program, so importing those needs GnuPG installed.
+- **Post-quantum age keys** are made and opened by the separate `age`
+  program, version 1.3 or newer, until fastlock can do it itself. They work
+  only when that program is installed. Until then new age keys are classic
+  keys by default, and `fastlock key new --pq` makes a post-quantum one.
+  Once fastlock can make them itself, post-quantum keys become the default.
+
+Where age keys live, and which folder holds the PGP keys, is not decided
+yet.
 
 ### TOTP
 
@@ -184,9 +202,9 @@ the session runs in the background instead.
 | Command | What it does |
 |---|---|
 | `fastlock key list` | Lists keys. `--type age\|ssh\|pgp` narrows the list. |
-| `fastlock key new <name>` | Creates a key. The default is a post-quantum age key. `--type ssh` and `--type pgp` create the other kinds, and `--classic` makes a classic age key. |
+| `fastlock key new <name>` | Creates a key: an age key by default, classic for now (see [Keys and where they live](#keys-and-where-they-live)). `--pq` makes a post-quantum age key. `--type ssh` and `--type pgp` create the other kinds. |
 | `fastlock key show <name>` | Shows one key: type, public key, fingerprint, and where it is stored. |
-| `fastlock key import <file>` | Adds a key from a file: your own, or someone's public key. |
+| `fastlock key import <file>` | Adds a key from a file: your own, or someone's public key. It can also import keys from `~/.ssh` and from GnuPG; how that is asked for is not decided. |
 | `fastlock key export <name>` | Writes the public key, to give to someone. `--secret` writes the private key. |
 | `fastlock key remove <name>` | Removes a key after confirmation. |
 
@@ -222,7 +240,9 @@ Reserved for later: `fastlock message encrypt` and
 
 Opening a file that uses a key needs the `age` program, version 1.3 or
 newer, installed on the computer. fastlock hands the key to it over a pipe.
-A file protected by a passphrase is opened by fastlock itself.
+A file protected by a passphrase is opened by fastlock itself. This is
+planned to change: fastlock will open classic age keys and SSH ed25519 keys
+itself, and only post-quantum keys will need the `age` program.
 
 ##### `fastlock inspect`
 
@@ -454,6 +474,9 @@ issues, reviews and commits can refer to it. Numbers are never reused.
   on the same device as the first one protects less.
 - **N6. Classic keys against a future quantum computer.** Only post-quantum
   age keys are designed for that. SSH keys and classic age keys are not.
+  Until fastlock can make post-quantum age keys itself, new age keys are
+  classic by default. `fastlock key new --pq` makes a post-quantum one, and
+  needs the `age` program for it.
 - **N7. Text typed into the desktop app.** The desktop app is a web-based
   window. Text typed into such a window passes through memory that fastlock
   cannot clear. How passphrases are entered in the desktop app is not
@@ -462,6 +485,16 @@ issues, reviews and commits can refer to it. Numbers are never reused.
   by the `age` program found on your computer, and that program receives
   your key. fastlock does not check that it is the genuine one. Install
   `age` from a source you trust.
+- **N9. A replaced `gpg` program.** Private keys are imported from GnuPG
+  through the `gpg` program found on your computer, and that program hands
+  your keys to fastlock. fastlock does not check that it is the genuine one.
+  Install GnuPG from a source you trust.
+- **N10. RSA keys and timing.** The RSA code that fastlock uses for SSH and
+  PGP keys has a known timing weakness, the Marvin attack
+  (RUSTSEC-2023-0071). Someone who can make fastlock decrypt many prepared
+  files and measure exactly how long each one takes could learn the private
+  key. fastlock only decrypts when you ask it to, which makes this hard, but
+  RSA keys are weaker here than ed25519 and X25519 keys. Prefer those.
 
 ### Audit status
 

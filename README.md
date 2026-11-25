@@ -16,9 +16,14 @@ inventing its own.
 - **Compress and encrypt in one step.** Modern lossless compression that
   shrinks your data without changing a byte of it, combined with the modern
   encryption you choose.
-- **Your keys stay yours.** fastlock keeps keys in the standard locations of
-  each tool, such as `~/.ssh` and `~/.gnupg`, so you can open them with any
-  other program at any time.
+- **Nothing else to install.** fastlock is one program file, with its
+  libraries built in, so it does not need GnuPG or other tools. For now,
+  post-quantum age keys are the one exception: they need the separate `age`
+  program.
+- **Your keys stay yours.** fastlock keeps every key in a standard format,
+  SSH keys in `~/.ssh` and PGP keys as OpenPGP files, so you can open them
+  with any other program at any time. It can import your keys from `~/.ssh`
+  and from GnuPG.
 - **Take your keys with you.** Export and import the keys you have saved.
   Store your TOTP keys in the same place and read your codes from it.
 - **Quick messages.** Encrypt and decrypt short text messages with PGP keys,
@@ -34,7 +39,8 @@ need:
 - [Rust](https://www.rust-lang.org/tools/install) 1.88 or newer, and a C
   compiler such as `gcc`, because the Zstandard library is built from C.
 - [age](https://github.com/FiloSottile/age) 1.3 or newer, to open files that
-  use a key. Files protected by a passphrase work without it.
+  use a key. Files protected by a passphrase work without it. This is
+  temporary: later, only post-quantum keys will need it.
 
 ```
 git clone https://github.com/ksterajewicz/fastlock
