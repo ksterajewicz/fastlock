@@ -29,7 +29,10 @@ sha2 = "0.11"
 tar = { version = "0.4", default-features = false }
 tempfile = "3"
 zeroize = "1"
-zstd = "0.14"
+# Without the default features: fastlock reads no pre-1.0 Zstandard formats
+# (`legacy`) and trains no dictionaries (`zdict_builder`), so that C code,
+# and the notices of its authors, stay out of the program.
+zstd = { version = "0.14", default-features = false }
 
 # Optimize dependencies in development builds too. Unoptimized cryptography
 # is slow enough to make the tests and the interfaces painful to use.
