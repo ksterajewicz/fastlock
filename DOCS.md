@@ -405,7 +405,8 @@ keys above.
 A desktop app is planned after the terminal interface, for Windows, macOS
 and Linux. It is built with Electron so that it looks the same on all three.
 It is only a front end: the work is done by the same native core that the
-commands use.
+commands use. It will be packaged with `electron-builder`, and the
+installers for Windows and macOS come with it.
 
 Its look is that of a modern, calm desktop app: a sidebar, a centered
 column, soft cards and generous spacing, in cold white and blue.

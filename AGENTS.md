@@ -129,6 +129,11 @@ decision describes behavior, the full description is in
 - **Desktop app:** planned after the terminal interface, built with
   Electron, for all three platforms. It is only a front end. Its look is in
   DOCS.md, "Desktop app".
+- **Installers for Windows and macOS** (2026-11-25): made with
+  `electron-builder` together with the desktop app, not before it.
+- **Order of work** (2026-11-25): first installation on Linux
+  (`install.sh`), then the core features as commands, then the terminal
+  interface for all of them.
 - **Key types:** age keys (classic and post-quantum), OpenPGP keys, and SSH
   keys. SSH keys are managed inside the program.
 - **Keys live in the standard locations** of each tool, such as `~/.ssh` and
