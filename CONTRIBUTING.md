@@ -8,8 +8,7 @@ are written.
   [AGENTS.md](AGENTS.md).
 - User documentation and the design of the program are in [DOCS.md](DOCS.md).
 
-fastlock is at an early stage and has no code yet. Sections that depend on
-code say so, and they will be filled in when the code lands.
+fastlock is at an early stage. Only a first part of it exists as code.
 
 ## The one rule
 
@@ -128,8 +127,29 @@ problem yourself before you send it.
 
 ## Building and testing
 
-Not available yet. When the first code lands, this section will give the one
-command that runs every check the project requires.
+You need Rust 1.88 or newer. The end-to-end tests also use the `age` and
+`age-keygen` programs, version 1.3 or newer; without them those tests skip
+themselves.
+
+Run these three before you send a change. All of them must pass without
+warnings:
+
+```
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets
+cargo test --workspace
+```
+
+The code lives in three crates:
+
+- `crates/fastlock-core`: everything that reads, checks and decrypts. No
+  interface code.
+- `crates/fastlock-cli`: the `fastlock` program. It parses arguments, asks
+  for what is missing, and prints results.
+- `crates/fastlock-tui`: the terminal interface.
+
+Tests use invented keys and invented data, created while the test runs.
+Never put a real key or real data into a test.
 
 ## License and credit
 

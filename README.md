@@ -2,7 +2,8 @@
 
 Fast, open-source file encryption and key management from the command line.
 
-> **Status:** early development. Nothing is released yet.
+> **Status:** early development. Nothing is released yet, and nothing has
+> been audited.
 
 fastlock brings several encryption tools together in one program. It is
 written in Rust, which makes it fast and reliable, and it works with
@@ -26,11 +27,23 @@ established formats instead of inventing its own.
 
 ## Installation
 
-Not available yet.
+There is no release yet. To try fastlock, build it from source. You need
+[Rust](https://www.rust-lang.org/tools/install) 1.88 or newer, and
+[age](https://github.com/FiloSottile/age) 1.3 or newer to open files that use
+a key.
+
+```
+git clone https://github.com/ksterajewicz/fastlock
+cd fastlock
+cargo build --release
+./target/release/fastlock --help
+```
 
 ## Commands
 
-Designed, not implemented yet. Details are in [DOCS.md](DOCS.md#commands).
+Working now: `inspect`, `verify`, `decrypt`, `tui`, `help` and `version`.
+The rest is designed and not implemented yet. Details are in
+[DOCS.md](DOCS.md#commands).
 
 | Command | What it does |
 |---|---|

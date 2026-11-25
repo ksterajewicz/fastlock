@@ -1,0 +1,14 @@
+[package]
+name = "fastlock-tui"
+description = "The terminal interface of fastlock: a thin layer over fastlock-core."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+fastlock-core.workspace = true
+ratatui.workspace = true
+crossterm.workspace = true
+zeroize.workspace = true

@@ -1,9 +1,10 @@
 # fastlock documentation
 
-> **Status, 2026-11-24:** fastlock is being designed. No code exists yet,
-> nothing can be installed, and nothing has been audited. This file describes
-> how the program is meant to work. Do not rely on it to protect anything
-> until a release says otherwise.
+> **Status, 2026-11-25:** fastlock is at an early stage. Three commands
+> work: `inspect`, `verify` and `decrypt`, plus a first terminal interface
+> for them. Everything else in this file describes how the program is meant
+> to work. Nothing has been released and nothing has been audited. Do not
+> rely on fastlock as your only way to open your files.
 
 This file is the documentation of fastlock: what the program does, how its
 interfaces behave, and what it does and does not protect.
@@ -120,10 +121,13 @@ device as your passwords.
 
 ### Commands
 
-The commands below were designed on 2026-11-24. None of them is implemented
-yet, and details can still change before the first release. A full entry for
-each command, with its synopsis, options and examples, is added when the
-command is implemented.
+The commands below were designed on 2026-11-24. Details can still change
+before the first release.
+
+**Working now:** `inspect`, `verify`, `decrypt`, `tui`, `help` and
+`version`. Each has a full entry under
+[Commands that work now](#commands-that-work-now). Everything else in the
+tables below is designed and not implemented yet.
 
 Every command has the shape `fastlock <command> [arguments] [flags]`.
 
@@ -213,6 +217,122 @@ the session runs in the background instead.
 Reserved for later: `fastlock message encrypt` and
 `fastlock message decrypt`, for quick messages with PGP keys.
 
+#### Commands that work now
+
+Opening a file that uses a key needs the `age` program, version 1.3 or
+newer, installed on the computer. fastlock hands the key to it over a pipe.
+A file protected by a passphrase is opened by fastlock itself.
+
+##### `fastlock inspect`
+
+```
+fastlock inspect <file> [--json]
+```
+
+Shows what a file is, without a key: its format, who can open it, whether
+it is post-quantum, its size, and whether a checksum file (`<file>.sha256`)
+sits next to it. A file that is not recognized is reported as such; that is
+not an error. The `--contents` flag is not implemented yet.
+
+```
+$ fastlock inspect backup.tar.zst.age
+backup.tar.zst.age
+  format         age v1
+  opens with     post-quantum age key
+  post-quantum   yes
+  size           2.9 MiB
+  checksum file  backup.tar.zst.age.sha256
+```
+
+Exit codes: 0 on success, 4 when the file starts like an age file but its
+header is damaged, 5 when the file does not exist.
+
+##### `fastlock verify`
+
+```
+fastlock verify <file> [--key <path>] [--passphrase-file <path>] [--json]
+```
+
+Decrypts the file in memory and checks it. Nothing is written to disk.
+
+1. **Checksum file.** When `<file>.sha256` exists, the encrypted file is
+   compared with it.
+2. **Decryption.** The whole file is decrypted and authenticated to its last
+   byte.
+3. **Compression.** Zstandard data is decompressed to its end.
+4. **Archive.** A tar archive is read to its end, and every file in it is
+   hashed.
+5. **Checksums inside.** When the archive holds a checksum list (a file
+   named `*.sha256` or `SHA256SUMS` in the `sha256sum` format), every listed
+   file is compared with it.
+
+A check that has nothing to work on is shown as skipped.
+
+`--key` names the key file for a file that opens with a key. When the key
+file is itself protected by a passphrase, fastlock asks for it, or reads it
+from `--passphrase-file`.
+
+```
+$ fastlock verify backup.tar.zst.age --key ~/keys/backup-key.age
+Passphrase for the key backup-key.age:
+✓ checksum file     matches backup.tar.zst.age.sha256
+✓ decryption        authenticated to the last byte, 2.9 MiB
+✓ compression       Zstandard, decompressed without errors
+✓ archive           3 files read to the end
+✓ checksums inside  2 files match the list inside
+
+  CHECKSUMS.sha256                         185 B
+  sample.dump                              2.9 MiB
+  store.db                                 3.8 MiB
+
+OK: backup.tar.zst.age is intact. Nothing was written.
+```
+
+Exit codes: 0 when every check passed, 2 when a key or a passphrase is
+missing, 3 for a wrong key or passphrase, 4 when the file is damaged or a
+checksum does not match, 5 when a file does not exist, 7 when you cancel.
+
+##### `fastlock decrypt`
+
+```
+fastlock decrypt <file> [-o <path>] [--key <path>] [--passphrase-file <path>] [--force] [--json]
+```
+
+Decrypts the file to disk and runs the same checks as `verify`.
+
+- An archive is unpacked into a folder. Other data is written as one file.
+- Without `-o`, the output goes next to the encrypted file, under its name
+  without the endings `.age`, `.zst` and `.tar`.
+- The output is written into a temporary folder first and moved into place
+  only after the whole file has been authenticated. A damaged file, a wrong
+  key, or Ctrl+C leaves nothing behind.
+- An existing file is replaced only with `--force`. An existing folder is
+  never replaced.
+- Folders and files are created readable by you only. Links and special
+  files inside an archive are listed, but not written.
+
+```
+$ fastlock decrypt backup.tar.zst.age -o restored --key ~/keys/backup-key.age
+```
+
+Exit codes: as for `verify`, and 6 when the output already exists.
+
+##### `fastlock tui`
+
+```
+fastlock tui [<folder>]
+```
+
+Opens the terminal interface in the given folder, or in the current one.
+
+##### Environment variables
+
+| Variable | Meaning |
+|---|---|
+| `FASTLOCK_KEY` | The path of a key file. The terminal interface offers it as the key file. It holds a path, never a key. |
+| `FASTLOCK_AGE` | The path of the `age` program to use, instead of the one found on `PATH`. |
+| `NO_COLOR` | When set and not empty, output has no colors. |
+
 #### Flags that work everywhere
 
 | Flag | Meaning |
@@ -225,6 +345,9 @@ Reserved for later: `fastlock message encrypt` and
 | `--yes` | Answer yes to confirmations. It never replaces a passphrase. |
 | `--passphrase-file <path>` | Read the passphrase from a file instead of a prompt. |
 | `--force` | Allow an existing file to be replaced. |
+
+`--yes` is not implemented yet, because no command asks for a confirmation
+yet.
 
 #### Exit codes
 
@@ -257,6 +380,10 @@ Search and forms open in place. Long operations show their progress. The
 mouse works: click to select, click again to open, and use the wheel to
 move.
 
+Today the terminal interface offers `verify` and `decrypt`. You pick a file
+from a list, see what it is before any key is asked for, enter the key file
+and the passphrase in place, and watch the checks come in.
+
 The keys follow Neovim:
 
 | Key | Action |
@@ -288,6 +415,8 @@ column, soft cards and generous spacing, in cold white and blue.
 Colors come from a theme file with about eight named colors: background,
 text, secondary text, accent, selection, ok, warning and error. Without a
 theme file, the terminal interface uses the colors of your terminal.
+Today only the terminal's own colors are used: secondary text is the
+terminal's text color, dimmed.
 
 The format of the theme file is not decided yet.
 
@@ -327,6 +456,10 @@ issues, reviews and commits can refer to it. Numbers are never reused.
   window. Text typed into such a window passes through memory that fastlock
   cannot clear. How passphrases are entered in the desktop app is not
   decided yet.
+- **N8. A replaced `age` program.** Files that open with a key are decrypted
+  by the `age` program found on your computer, and that program receives
+  your key. fastlock does not check that it is the genuine one. Install
+  `age` from a source you trust.
 
 ### Audit status
 

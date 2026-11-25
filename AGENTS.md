@@ -16,9 +16,14 @@ format, point it at this file.
 
 One topic has one home. Link to it; do not copy it into another file.
 
-fastlock has no code yet, so everything here was written by hand from
-decisions. Once code exists and a file disagrees with it, the code is right:
-fix the file in the same change.
+Only the first part of fastlock exists as code: `inspect`, `verify` and
+`decrypt`, and a terminal interface for them. Where a file here disagrees
+with the code, the code is right: fix the file in the same change.
+
+The code is a Cargo workspace of three crates. `crates/fastlock-core` reads,
+checks and decrypts, and has no interface code. `crates/fastlock-cli` is the
+`fastlock` program. `crates/fastlock-tui` is the terminal interface. The two
+interfaces only call the core.
 
 ## What fastlock is
 
@@ -86,13 +91,17 @@ Stop and ask the maintainer before you:
 
 ## Before you call a task done
 
-1. Show evidence: the command you ran and its output, or the file and line.
-   Do not rely on memory for versions, licenses, or security properties;
-   check the source.
-2. Update the documentation in the same change. See "Writing documentation".
-3. Check that nothing private and no Polish text is in the change.
-4. If a check fails, find out why. Do not assume it was already failing.
-5. Ask before you commit.
+1. Run the checks, all three, and show their output. They must pass without
+   warnings:
+   `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets`,
+   `cargo test --workspace`.
+2. Show evidence for what you claim: the command you ran and its output, or
+   the file and line. Do not rely on memory for versions, licenses, or
+   security properties; check the source.
+3. Update the documentation in the same change. See "Writing documentation".
+4. Check that nothing private and no Polish text is in the change.
+5. If a check fails, find out why. Do not assume it was already failing.
+6. Ask before you commit.
 
 ## Decisions
 
@@ -146,7 +155,13 @@ maintainer has not confirmed each one. Ask before you build on any of them in
 a way that is hard to undo.
 
 - Layout: a core library with no interface code, a command-line program, and
-  interfaces as thin layers over the core.
+  interfaces as thin layers over the core. The code is built this way.
+- How files are opened today: a file that uses a key is decrypted by the
+  official `age` program, which receives the key over a pipe. A file
+  protected by a passphrase, and a key file protected by one, are decrypted
+  with the `age` crate. This answers open question 2 for now, but the
+  maintainer has not chosen it as the long-term way.
+- Tests never use real keys or real data. They create both while they run.
 - Formats are compiled-in modules behind one common interface, not plugins
   loaded at run time.
 - New files are encrypted in the age format by default.
@@ -185,7 +200,8 @@ Do not settle these on your own.
    how a passphrase is entered so that it stays out of the web layer.
 10. **Quick messages.** Whether signing and verifying are part of it, and
     where the text comes from and goes to.
-11. **Checks.** The one command that runs every check, and the CI setup.
+11. **Checks.** Whether the three check commands get one wrapper command,
+    and the CI setup.
 12. **Command reference.** Whether it is generated from the code, and
     whether it lives inside `DOCS.md` or in a separate generated file.
 

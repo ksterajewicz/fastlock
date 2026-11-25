@@ -1,0 +1,41 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/fastlock-core",
+    "crates/fastlock-cli",
+    "crates/fastlock-tui",
+]
+
+[workspace.package]
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.88"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/ksterajewicz/fastlock"
+
+[workspace.dependencies]
+fastlock-core = { path = "crates/fastlock-core" }
+fastlock-tui = { path = "crates/fastlock-tui" }
+
+age = { version = "0.12", features = ["armor"] }
+clap = { version = "4", features = ["derive"] }
+crossterm = "0.29"
+ctrlc = "3"
+ratatui = "0.30"
+rpassword = "7"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.11"
+tar = { version = "0.4", default-features = false }
+tempfile = "3"
+zeroize = "1"
+zstd = "0.14"
+
+# Optimize dependencies in development builds too. Unoptimized cryptography
+# is slow enough to make the tests and the interfaces painful to use.
+[profile.dev.package."*"]
+opt-level = 2
+
+[profile.release]
+lto = "thin"
+strip = true

@@ -1,0 +1,26 @@
+[package]
+name = "fastlock-cli"
+description = "The fastlock command-line program."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "fastlock"
+path = "src/main.rs"
+
+[features]
+default = ["tui"]
+tui = ["dep:fastlock-tui"]
+
+[dependencies]
+fastlock-core.workspace = true
+fastlock-tui = { workspace = true, optional = true }
+
+clap.workspace = true
+ctrlc.workspace = true
+rpassword.workspace = true
+serde.workspace = true
+serde_json.workspace = true
