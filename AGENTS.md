@@ -23,7 +23,8 @@ with the code, the code is right: fix the file in the same change.
 The code is a Cargo workspace of three crates. `crates/fastlock-core` reads,
 checks and decrypts, and has no interface code. `crates/fastlock-cli` is the
 `fastlock` program. `crates/fastlock-tui` is the terminal interface. The two
-interfaces only call the core.
+interfaces only call the core. `install.sh` builds and installs the program
+on Linux, and `tests/install-test.sh` tests it.
 
 ## What fastlock is
 
@@ -94,7 +95,9 @@ Stop and ask the maintainer before you:
 1. Run the checks, all three, and show their output. They must pass without
    warnings:
    `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets`,
-   `cargo test --workspace`.
+   `cargo test --workspace`. When `install.sh` or its tests change, also
+   run `shellcheck install.sh tests/install-test.sh` and
+   `tests/install-test.sh`.
 2. Show evidence for what you claim: the command you ran and its output, or
    the file and line. Do not rely on memory for versions, licenses, or
    security properties; check the source.
@@ -156,8 +159,7 @@ decision describes behavior, the full description is in
   credited, and the software can never become a closed product. Do not add
   code or dependencies whose license is not compatible with it.
 - **Documentation layout:** as in "Where things live". `README.md` stays
-  short. Its "Installation" section is a placeholder until there is
-  something to install.
+  short. Its "Installation" section describes `install.sh`.
 
 ## Working assumptions
 

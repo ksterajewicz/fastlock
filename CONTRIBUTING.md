@@ -141,6 +141,16 @@ cargo clippy --workspace --all-targets
 cargo test --workspace
 ```
 
+A change to `install.sh` also needs these two, and
+[ShellCheck](https://www.shellcheck.net/) for the first one. The tests use
+stand-in programs, work offline, and take a few seconds;
+`tests/install-test.sh --build` also builds and installs the real program.
+
+```
+shellcheck install.sh tests/install-test.sh
+tests/install-test.sh
+```
+
 The code lives in three crates:
 
 - `crates/fastlock-core`: everything that reads, checks and decrypts. No

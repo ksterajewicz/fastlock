@@ -28,17 +28,42 @@ inventing its own.
 
 ## Installation
 
-There is no release yet. To try fastlock, build it from source. You need
-[Rust](https://www.rust-lang.org/tools/install) 1.88 or newer, and
-[age](https://github.com/FiloSottile/age) 1.3 or newer to open files that use
-a key.
+There is no release yet. On Linux, fastlock is installed from source. You
+need:
+
+- [Rust](https://www.rust-lang.org/tools/install) 1.88 or newer, and a C
+  compiler such as `gcc`, because the Zstandard library is built from C.
+- [age](https://github.com/FiloSottile/age) 1.3 or newer, to open files that
+  use a key. Files protected by a passphrase work without it.
 
 ```
 git clone https://github.com/ksterajewicz/fastlock
 cd fastlock
-cargo build --release
-./target/release/fastlock --help
+./install.sh
 ```
+
+`install.sh` builds fastlock and installs it into `~/.local/bin`. When that
+folder is not on your `PATH`, it prints the line to add. It does not edit
+your shell files and never touches your keys. The first build downloads the
+dependencies and takes a few minutes.
+
+| Command | What it does |
+|---|---|
+| `./install.sh --prefix /usr/local` | Install into `/usr/local/bin` instead. |
+| `./install.sh --binary <file>` | Install a program you have already built. |
+| `./install.sh --uninstall` | Remove the program. |
+| `./install.sh --help` | Show all options. |
+
+Running `./install.sh` again updates fastlock in place. A file that is not
+fastlock is never replaced unless you add `--force`. To install for every
+user, build as yourself, then install as root:
+
+```
+cargo build --release --locked
+sudo ./install.sh --prefix /usr/local --binary target/release/fastlock
+```
+
+Windows and macOS are not supported yet.
 
 ## Commands
 
