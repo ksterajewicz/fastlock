@@ -177,9 +177,19 @@ Never put a real key or real data into a test.
 - Submit only work that you have the right to submit: your own, or work
   under a license compatible with ours.
 - The authors of the libraries compiled into fastlock are credited, with
-  each license, in a file `THIRD-PARTY-LICENSES` generated with
-  `cargo-about`. The file is being added. Once it exists, a change that adds
-  or updates a dependency regenerates it.
+  each license, in [THIRD-PARTY-LICENSES](THIRD-PARTY-LICENSES). The file is
+  generated; do not edit it by hand. A change that adds or updates a
+  dependency regenerates it with
+  [cargo-about](https://github.com/EmbarkStudios/cargo-about) 0.9.3 or
+  newer:
+
+  ```
+  cargo about generate --locked --fail about.hbs -o THIRD-PARTY-LICENSES
+  ```
+
+  The command fails when a library has a license that `about.toml` does not
+  accept. When a new library shows up in the file with a placeholder instead
+  of a copyright line, add its real notice to `about.toml` or `about.hbs`.
 - Your authorship stays in the history of the project. When a change is
   reworked before it is merged, the original author is kept with a
   `Co-authored-by:` line.

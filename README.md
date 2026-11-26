@@ -117,3 +117,6 @@ first. It explains the rules, including how commits are written.
 fastlock is free software, released under the
 [GNU General Public License v3.0 or later](LICENSE). It is open source and
 will stay that way.
+
+The libraries built into fastlock, their licenses and their authors are
+listed in [THIRD-PARTY-LICENSES](THIRD-PARTY-LICENSES).

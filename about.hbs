@@ -18,12 +18,43 @@ Libraries written in C that are compiled into fastlock
   Copyright (c) 2016 Tino Reichardt.
   License: BSD-3-Clause, the text is below.
 
+Libraries that publish no license file
+--------------------------------------
+
+The packages of the libraries below contain no license file. In the list
+further down they appear under the MIT License with a placeholder instead
+of a copyright line. Their real notices, taken from their own repositories
+and package manifests, are these. Each is used under the MIT License.
+
+- age and age-core
+  Copyright (c) 2019 Jack Grigg
+  Source: LICENSE-MIT in https://github.com/str4d/rage
+- cookie-factory
+  Copyright (c) 2017-2023 Geoffroy Couprie
+  Source: LICENSES/MIT.txt in https://github.com/rust-bakery/cookie-factory
+- fluent-langneg
+  Copyright Mozilla Foundation
+  Source: LICENSE-MIT in https://github.com/projectfluent/fluent-langneg-rs
+- intl_pluralrules
+  Its license file has no copyright line. Authors named in its manifest:
+  Kekoa Riggin, Zibi Braniecki.
+  Source: https://github.com/zbraniecki/pluralrules
+- io_tee
+  It publishes no license file and names no author. It states its license,
+  MIT OR Apache-2.0, in its manifest and README.
+  Source: https://github.com/TheOnlyMrCat/io_tee
+- objc2, block2, objc2-encode and dispatch2 (used on macOS only)
+  They publish no copyright line. Authors named in their manifests:
+  Mads Marquart, and for dispatch2 also Mary.
+  Source: LICENSE.md in https://github.com/madsmtm/objc2
+
 Licenses
 --------
 {{#each licenses}}
+{{#if (and (ne id "GPL-3.0-or-later") (ne id "GPL-3.0"))}}
 
 ================================================================================
-{{name}} ({{id}})
+{{{name}}} ({{id}})
 
 Used by:
 {{#each used_by}}
@@ -31,4 +62,5 @@ Used by:
 {{/each}}
 
 {{{text}}}
+{{/if}}
 {{/each}}

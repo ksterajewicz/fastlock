@@ -41,15 +41,89 @@ targets = [
 ignore-build-dependencies = true
 ignore-dev-dependencies = true
 
-# The crates of this workspace are fastlock itself.
+# The crates of this workspace are fastlock itself. Their own license is
+# accepted for them alone, at the end of this file, and about.hbs leaves
+# them out of the list.
 private = { ignore = true }
 
-# zstd-sys is MIT OR Apache-2.0, but it compiles the C sources of Zstandard,
-# which are under their own BSD-3-Clause license (or GPL-2.0, not used here).
+# Clarifications: crates whose license files cargo-about does not find or
+# recognize by itself. Each names a file inside the crate and its SHA-256, so
+# that a changed file is noticed. Crates that ship no license file at all are
+# credited in about.hbs instead.
+
+# zstd-sys compiles the C sources of Zstandard. Its three files are the
+# license of the bindings, of Zstandard itself, and of the legacy decoders.
 [zstd-sys.clarify]
-license = "(MIT OR Apache-2.0) AND BSD-3-Clause"
+license = "BSD-3-Clause AND BSD-2-Clause"
 
 [[zstd-sys.clarify.files]]
-path = "zstd/LICENSE"
+path = "LICENSE"
 license = "BSD-3-Clause"
-checksum = "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8"
+checksum = "ce4868c8e4ebe47a7d4b3c93dbf6b802033e5ae2fa7638098173f80836daac60"
+
+[[zstd-sys.clarify.files]]
+path = "LICENSE.BSD-3-Clause"
+license = "BSD-3-Clause"
+checksum = "bf7017a73a95ea63bf3716b13ec2bcd79c92942356e3408c6fb66332bad6d977"
+
+[[zstd-sys.clarify.files]]
+path = "LICENSE.BSD-2-Clause"
+license = "BSD-2-Clause"
+checksum = "982cd76c8a6b5c597aa999be672c4f16b953eb6d074fe29c0a931d7aae2c8fc2"
+
+# One file holds two BSD-3-Clause texts: the crate's own, and that of the Go
+# code it was derived from. Each checksum is of the text from `start` to
+# `end`.
+[curve25519-dalek.clarify]
+license = "BSD-3-Clause"
+
+[[curve25519-dalek.clarify.files]]
+path = "LICENSE"
+license = "BSD-3-Clause"
+checksum = "db7e563b03fa70fa9998fbcae9b432057b7430740a58672c9a8df17af6e078d7"
+start = "Copyright (c) 2016-2021 isis agora lovecruft."
+end = "SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+
+[[curve25519-dalek.clarify.files]]
+path = "LICENSE"
+license = "BSD-3-Clause"
+checksum = "b790bcf9428074d098a455163df68ec35589ae22536051f3555a592c1e4dd772"
+start = "Copyright (c) 2012 The Go Authors."
+end = "SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+
+# The license file has CRLF line endings, which cargo-about does not
+# recognize.
+[type-map.clarify]
+license = "MIT"
+
+[[type-map.clarify.files]]
+path = "LICENSE-MIT"
+license = "MIT"
+checksum = "b47fb719a40d9ef9c8e3be525c41ce129c46d613cfc96a91bddd7c19dcebf7a1"
+
+# The license files have lowercase names, which cargo-about does not look for.
+[windows-link.clarify]
+license = "MIT"
+
+[[windows-link.clarify.files]]
+path = "license-mit"
+license = "MIT"
+checksum = "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+
+[windows-sys.clarify]
+license = "MIT"
+
+[[windows-sys.clarify.files]]
+path = "license-mit"
+license = "MIT"
+checksum = "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+
+# The crates of this workspace: fastlock itself.
+[fastlock-core]
+accepted = ["GPL-3.0-or-later"]
+
+[fastlock-cli]
+accepted = ["GPL-3.0-or-later"]
+
+[fastlock-tui]
+accepted = ["GPL-3.0-or-later"]
